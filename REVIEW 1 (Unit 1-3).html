@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REVIEW 1 (Unit 1-3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12301f;
+    --ink-soft:#3f5548;
+    --paper:#eef3ec;
+    --card:#ffffff;
+    --amber:#c8871a;
+    --amber-deep:#a86e10;
+    --good:#1f7a4d;
+    --good-bg:#e3f3e8;
+    --bad:#b23b2e;
+    --bad-bg:#fbe7e3;
+    --line: rgba(18,48,31,0.16);
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+    line-height:1.5;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px);
+    background-size: 100% 120px;
+    opacity:0.35;
+    z-index:0;
+  }
+  .wrap{ position:relative; z-index:1; width:100%; max-width:620px; }
+  header.top{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:22px; gap:12px;
+  }
+  header.top h1{
+    font-family:var(--serif); font-size:22px; font-weight:600; margin:0; letter-spacing:-0.01em;
+  }
+  header.top .tag{ font-size:13px; color:var(--ink-soft); white-space:nowrap; }
+  .progress-track{
+    height:6px; background:rgba(18,48,31,0.12); border-radius:3px; overflow:hidden; margin-bottom:36px;
+  }
+  .progress-fill{ height:100%; background:var(--amber); width:0%; transition:width .35s ease; }
+
+  .card{ background:var(--card); border:2px solid var(--ink); border-radius:6px; padding:32px 28px; }
+  .qmeta{ display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--ink-soft); margin-bottom:18px; }
+  .prompt-label{ font-size:13px; color:var(--ink-soft); margin-bottom:6px; }
+  .term{ font-family:var(--serif); font-size:27px; font-weight:700; line-height:1.25; margin:0 0 6px; }
+  .ipa{ font-size:15px; color:var(--amber-deep); margin:0 0 26px; font-weight:500; }
+
+  .choices{ display:flex; flex-direction:column; gap:10px; }
+  .choice-btn{
+    text-align:left; background:var(--card); border:1.5px solid var(--ink); border-radius:5px;
+    padding:13px 16px; font-family:var(--sans); font-size:15px; color:var(--ink); cursor:pointer;
+    transition:background .15s ease;
+  }
+  .choice-btn:hover:not(:disabled){ background:#f1ede1; }
+  .choice-btn:disabled{ cursor:default; }
+  .choice-btn.correct{ background:var(--good-bg); border-color:var(--good); color:var(--good); font-weight:600; }
+  .choice-btn.wrong{ background:var(--bad-bg); border-color:var(--bad); color:var(--bad); font-weight:600; }
+
+  .feedback{ margin-top:20px; padding-top:18px; border-top:1px dashed var(--line); display:none; }
+  .feedback.show{ display:block; }
+  .fb-verdict{ font-weight:700; font-size:15px; margin-bottom:8px; }
+  .fb-verdict.good{ color:var(--good); }
+  .fb-verdict.bad{ color:var(--bad); }
+  .fb-meaning{ font-size:15px; }
+  .fb-example{ font-size:14px; color:var(--ink-soft); font-style:italic; margin-top:6px; }
+  .next-btn{
+    margin-top:20px; width:100%; font-family:var(--sans); font-weight:700; font-size:15px;
+    padding:13px; background:var(--amber); color:#2a1c02; border:none; border-radius:5px; cursor:pointer;
+  }
+  .next-btn:hover{ background:var(--amber-deep); color:#fff; }
+
+  .results h2{ font-family:var(--serif); font-size:28px; margin:0 0 6px; }
+  .score-big{ font-family:var(--serif); font-size:56px; font-weight:700; color:var(--amber-deep); margin:14px 0 4px; }
+  .score-sub{ color:var(--ink-soft); font-size:14px; margin-bottom:26px; }
+  .review-list{ list-style:none; padding:0; margin:0 0 24px; display:flex; flex-direction:column; gap:10px; }
+  .review-list li{ border-left:3px solid var(--bad); padding:8px 14px; background:var(--bad-bg); border-radius:0 4px 4px 0; font-size:14px; }
+  .review-list li b{ font-family:var(--serif); font-size:15px; }
+  .no-wrong{ font-size:14px; color:var(--good); margin-bottom:24px; }
+  .restart-btn{
+    width:100%; font-family:var(--sans); font-weight:700; font-size:15px; padding:14px;
+    background:var(--ink); color:var(--paper); border:none; border-radius:5px; cursor:pointer;
+  }
+
+  @media (max-width:480px){
+    .card{ padding:24px 18px; }
+    .term{ font-size:22px; }
+    .score-big{ font-size:44px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>REVIEW 1 (Unit 1-3)</h1>
+    <span class="tag" id="counterTag">1 / 60</span>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="card" id="quizCard"></div>
+</div>
+
+<script>
+const VOCAB = [
+{term:"obey the rules",ipa:"/əˈbeɪ ðə ruːlz/",meaning:"tuân thủ quy tắc",example:"Students must obey the rules at school."},
+{term:"violate the rules",ipa:"/ˈvaɪəleɪt ðə ruːlz/",meaning:"vi phạm quy tắc",example:"He was punished for violating the rules."},
+{term:"career choice",ipa:"/kəˈrɪr tʃɔɪs/",meaning:"sự lựa chọn nghề nghiệp",example:"Choosing a career choice can be difficult for teenagers."},
+{term:"security",ipa:"/sɪˈkjʊrəti/",meaning:"an ninh, sự an toàn",example:"The company improved its online security."},
+{term:"high cost of living",ipa:"/haɪ kɒst əv ˈlɪvɪŋ/",meaning:"chi phí sinh hoạt cao",example:"Many young people struggle with the high cost of living in big cities."},
+{term:"cut down on sth",ipa:"/kʌt daʊn ɒn/",meaning:"cắt giảm cái gì",example:"You should cut down on sugar."},
+{term:"higher levels of education",ipa:"/ˈhaɪər ˈlevlz əv ˌedʒuˈkeɪʃn/",meaning:"trình độ học vấn cao hơn",example:"People with higher levels of education often earn more."},
+{term:"limit the screen time",ipa:"/ˈlɪmɪt ðə skriːn taɪm/",meaning:"giảm thời gian nhìn màn hình",example:"Parents try to limit the screen time of young children."},
+{term:"infection",ipa:"/ɪnˈfekʃn/",meaning:"sự nhiễm trùng",example:"The doctor prescribed antibiotics to treat infections caused by bacteria."},
+{term:"strength",ipa:"/streŋθ/",meaning:"sức mạnh",example:"Regular exercise builds strength."},
+{term:"pose a serious threat to sth",ipa:"/poʊz ə ˈsɪriəs θret tuː/",meaning:"gây ra mối đe dọa nghiêm trọng đến cái gì",example:"Climate change poses a serious threat to the planet."},
+{term:"expose sb to sth",ipa:"/ɪkˈspoʊz tuː/",meaning:"cho ai tiếp xúc, đối mặt với cái gì",example:"Traveling exposes students to new cultures."},
+{term:"fail to V",ipa:"/feɪl tuː/",meaning:"không làm được gì",example:"He failed to complete the assignment on time."},
+{term:"recognize",ipa:"/ˈrekəɡnaɪz/",meaning:"nhận ra, nhận thức được",example:"It's important to recognize your own mistakes."},
+{term:"grow up",ipa:"/ɡroʊ ʌp/",meaning:"lớn lên, trưởng thành",example:"She grew up in a small town."},
+{term:"desire",ipa:"/dɪˈzaɪər/",meaning:"khao khát, mong muốn",example:"Teenagers often desire more independence."},
+{term:"strive to V",ipa:"/straɪv tuː/",meaning:"nỗ lực làm gì",example:"Students strive to achieve their goals."},
+{term:"unique identity",ipa:"/juˈniːk aɪˈdentəti/",meaning:"bản sắc riêng",example:"Every culture has its own unique identity."},
+{term:"trendy clothes",ipa:"/ˈtrendi kloʊðz/",meaning:"quần áo hợp mốt",example:"Teenagers often like to wear trendy clothes."},
+{term:"align with",ipa:"/əˈlaɪn wɪð/",meaning:"phù hợp, đồng bộ với",example:"His opinions align with mine."},
+{term:"value more traditional attire",ipa:"/ˈvæljuː mɔːr trəˈdɪʃənl əˈtaɪr/",meaning:"coi trọng trang phục truyền thống hơn",example:"Older generations often value more traditional attire."},
+{term:"tensions escalate",ipa:"/ˈtenʃnz ˈeskəleɪt/",meaning:"căng thẳng leo thang",example:"Tensions escalated between the two neighboring countries."},
+{term:"exceed",ipa:"/ɪkˈsiːd/",meaning:"vượt quá",example:"The cost exceeded our budget."},
+{term:"financial means",ipa:"/faɪˈnænʃl miːnz/",meaning:"khả năng tài chính",example:"Not everyone has the financial means to travel abroad."},
+{term:"career paths",ipa:"/kəˈrɪr pæθs/",meaning:"con đường sự nghiệp",example:"Students can choose from many different career paths."},
+{term:"educational choices",ipa:"/ˌedʒuˈkeɪʃənl tʃɔɪsɪz/",meaning:"lựa chọn giáo dục",example:"Parents often influence their children's educational choices."},
+{term:"exhilarating",ipa:"/ɪɡˈzɪləreɪtɪŋ/",meaning:"rất phấn chấn, hào hứng",example:"Skydiving was an exhilarating experience."},
+{term:"cure",ipa:"/kjʊr/",meaning:"phương pháp chữa bệnh",example:"Scientists are searching for a cure for the disease."},
+{term:"exorbitant",ipa:"/ɪɡˈzɔːrbɪtənt/",meaning:"quá đắt đỏ",example:"The price of the tickets was exorbitant."},
+{term:"treat the infections",ipa:"/triːt ðə ɪnˈfekʃnz/",meaning:"điều trị tình trạng nhiễm trùng",example:"Doctors use antibiotics to treat the infections."},
+{term:"household chores",ipa:"/ˈhaʊshoʊld tʃɔːrz/",meaning:"việc nhà",example:"Children should help with household chores."},
+{term:"expire / run low",ipa:"/ɪkˈspaɪər / rʌn loʊ/",meaning:"hết hạn / sắp hết",example:"The medicine will expire next month."},
+{term:"go on vacation to + place",ipa:"/ɡoʊ ɒn veɪˈkeɪʃn tuː/",meaning:"đi nghỉ ở đâu",example:"We are going on vacation to Da Lat this summer."},
+{term:"spread of disease",ipa:"/spred əv dɪˈziːz/",meaning:"sự lan rộng của dịch bệnh",example:"Vaccines help prevent the spread of disease."},
+{term:"regular health check-ups",ipa:"/ˈreɡjələr helθ ˈtʃekʌps/",meaning:"khám sức khỏe định kỳ",example:"Regular health check-ups can detect problems early."},
+{term:"swift/prompt intervention",ipa:"/swɪft, prɒmpt ˌɪntərˈvenʃn/",meaning:"sự can thiệp nhanh chóng",example:"Swift intervention saved the patient's life."},
+{term:"existential threats",ipa:"/ˌeɡzɪˈstenʃl θrets/",meaning:"mối đe dọa sống còn",example:"Climate change is one of the biggest existential threats today."},
+{term:"assist sb with sth",ipa:"/əˈsɪst wɪð/",meaning:"giúp ai việc gì",example:"She assisted her classmate with the homework."},
+{term:"pick up the phone / hang up the phone",ipa:"/pɪk ʌp ðə foʊn / hæŋ ʌp ðə foʊn/",meaning:"nhấc máy >< cúp máy",example:"He picked up the phone and then hung up quickly."},
+{term:"indifferent / neutral",ipa:"/ɪnˈdɪfrənt / ˈnuːtrəl/",meaning:"thờ ơ / trung lập",example:"He remained indifferent to the criticism."},
+{term:"dismissive",ipa:"/dɪsˈmɪsɪv/",meaning:"xem nhẹ, bác bỏ",example:"She was dismissive of his ideas."},
+{term:"eliminate",ipa:"/ɪˈlɪmɪneɪt/",meaning:"loại bỏ",example:"The team was eliminated in the first round."},
+{term:"I'm afraid (that) + clause",ipa:"/aɪm əˈfreɪd/",meaning:"tôi e rằng...",example:"I'm afraid that I can't come to the party."},
+{term:"tidy up",ipa:"/ˈtaɪdi ʌp/",meaning:"dọn dẹp",example:"Please tidy up your room before dinner."},
+{term:"lend sb sth",ipa:"/lend/",meaning:"cho mượn",example:"Can you lend me your pen?"},
+{term:"borrow sth from sb",ipa:"/ˈbɒroʊ frʌm/",meaning:"đi mượn",example:"I borrowed a book from the library."},
+{term:"pick",ipa:"/pɪk/",meaning:"nhặt, hái (hoa)",example:"She picked some flowers from the garden."},
+{term:"follow in sb's footsteps",ipa:"/ˈfɒloʊ ɪn ˈfʊtsteps/",meaning:"theo gót, nối nghiệp ai",example:"He followed in his father's footsteps and became a doctor."},
+{term:"come into conflict with sb",ipa:"/kʌm ˈɪntuː ˈkɒnflɪkt wɪð/",meaning:"xung đột với ai",example:"He often comes into conflict with his teacher."},
+{term:"be incapable of + V-ing / N",ipa:"/biː ɪnˈkeɪpəbl əv/",meaning:"không có khả năng làm gì",example:"He seems incapable of admitting his mistakes."},
+{term:"view sb as + adj/N",ipa:"/vjuː æz/",meaning:"xem ai là",example:"People view him as a role model."},
+{term:"regardless of",ipa:"/rɪˈɡɑːrdləs əv/",meaning:"bất kể",example:"She continued, regardless of the difficulties."},
+{term:"instead of / in place of",ipa:"/ɪnˈsted əv / ɪn pleɪs əv/",meaning:"thay vì / thay thế cho",example:"Use honey instead of sugar."},
+{term:"be enthusiastic about sth",ipa:"/biː ɪnˌθuːziˈæstɪk əˈbaʊt/",meaning:"hào hứng với cái gì",example:"She is enthusiastic about learning new languages."},
+{term:"lead to sth",ipa:"/liːd tuː/",meaning:"dẫn đến",example:"Stress can lead to health problems."},
+{term:"the world is our oyster",ipa:"/ðə wɜːrld ɪz aʊər ˈɔɪstər/",meaning:"thế giới nằm trong tầm tay",example:"With so many opportunities, the world is our oyster."},
+{term:"financial means (2)",ipa:"/faɪˈnænʃl miːnz/",meaning:"điều kiện tài chính",example:"He didn't have the financial means to start a business."},
+{term:"critical thinkers",ipa:"/ˈkrɪtɪkl ˈθɪŋkərz/",meaning:"người có tư duy phản biện",example:"Schools should train students to be critical thinkers."},
+{term:"escalate",ipa:"/ˈeskəleɪt/",meaning:"tăng, leo thang",example:"The conflict began to escalate quickly."},
+{term:"thanks to + N",ipa:"/θæŋks tuː/",meaning:"nhờ có",example:"Thanks to modern medicine, many diseases are now curable."}
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let order = [];
+let current = 0;
+let score = 0;
+let wrongItems = [];
+let answered = false;
+
+function startQuiz(){
+  order = shuffle(VOCAB);
+  current = 0;
+  score = 0;
+  wrongItems = [];
+  renderQuestion();
+}
+
+function buildChoices(correctItem){
+  const pool = VOCAB.filter(v=>v.meaning!==correctItem.meaning);
+  const distractors = shuffle(pool).slice(0,3).map(v=>v.meaning);
+  return shuffle([correctItem.meaning, ...distractors]);
+}
+
+function renderQuestion(){
+  answered = false;
+  const total = order.length;
+  document.getElementById('counterTag').textContent = (current+1)+" / "+total;
+  document.getElementById('progressFill').style.width = ((current)/total*100)+"%";
+
+  const item = order[current];
+  const card = document.getElementById('quizCard');
+
+  let bodyHtml = `
+    <div class="qmeta"><span>Câu ${current+1} / ${total}</span></div>
+    <div class="prompt-label">Cụm từ này có nghĩa là gì?</div>
+    <div class="term">${item.term.replace(" (2)","")}</div>
+    <div class="ipa">${item.ipa}</div>
+    <div class="choices" id="choicesBox">
+  `;
+  const choices = buildChoices(item);
+  choices.forEach(c=>{
+    bodyHtml += `<button class="choice-btn" data-answer="${encodeURIComponent(c)}" onclick="handleChoice(this)">${c}</button>`;
+  });
+  bodyHtml += `</div><div class="feedback" id="feedbackBox"></div>`;
+
+  card.innerHTML = bodyHtml;
+}
+
+function showFeedback(isCorrect, item){
+  const fb = document.getElementById('feedbackBox');
+  fb.classList.add('show');
+  fb.innerHTML = `
+    <div class="fb-verdict ${isCorrect?'good':'bad'}">${isCorrect ? 'Chính xác!' : 'Chưa đúng.'}</div>
+    <div class="fb-meaning">Nghĩa đúng: <strong>${item.meaning}</strong></div>
+    <div class="fb-example">Ví dụ: ${item.example}</div>
+  `;
+  const btn = document.createElement('button');
+  btn.className = 'next-btn';
+  btn.textContent = (current === order.length-1) ? 'Xem kết quả' : 'Câu tiếp theo';
+  btn.onclick = goNext;
+  fb.appendChild(btn);
+}
+
+function handleChoice(btn){
+  if(answered) return;
+  answered = true;
+  const item = order[current];
+  const chosen = decodeURIComponent(btn.getAttribute('data-answer'));
+  const isCorrect = chosen === item.meaning;
+
+  document.querySelectorAll('.choice-btn').forEach(b=>{
+    b.disabled = true;
+    const val = decodeURIComponent(b.getAttribute('data-answer'));
+    if(val === item.meaning) b.classList.add('correct');
+    else if(b===btn) b.classList.add('wrong');
+  });
+
+  if(isCorrect) score++;
+  else wrongItems.push(item);
+
+  showFeedback(isCorrect, item);
+}
+
+function goNext(){
+  if(current === order.length-1){
+    renderResults();
+  } else {
+    current++;
+    renderQuestion();
+  }
+}
+
+function renderResults(){
+  document.getElementById('progressFill').style.width = "100%";
+  document.getElementById('counterTag').textContent = order.length+" / "+order.length;
+  const total = order.length;
+  const pct = Math.round(score/total*100);
+
+  let html = `
+    <div class="results">
+      <h2>Hoàn thành!</h2>
+      <div class="score-big">${score}/${total}</div>
+      <div class="score-sub">Bạn đã trả lời đúng ${pct}% số câu hỏi.</div>
+  `;
+
+  if(wrongItems.length === 0){
+    html += `<div class="no-wrong">Xuất sắc! Không có câu nào sai.</div>`;
+  } else {
+    html += `<ul class="review-list">`;
+    wrongItems.forEach(item=>{
+      html += `<li><b>${item.term.replace(" (2)","")}</b> — ${item.meaning}</li>`;
+    });
+    html += `</ul>`;
+  }
+
+  html += `<button class="restart-btn" onclick="startQuiz()">Làm lại từ đầu</button></div>`;
+
+  document.getElementById('quizCard').innerHTML = html;
+}
+
+startQuiz();
+</script>
+</body>
+</html>
